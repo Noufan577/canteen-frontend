@@ -1,0 +1,64 @@
+.scanner-page {
+  max-width: 600px;
+  margin: 30px auto;
+  text-align: center;
+}
+
+.scanner-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 20px auto;
+  border: 5px solid #333;
+  border-radius: 12px;
+  overflow: hidden; /* Hides parts of the video that overflow the border */
+}
+
+.result-container {
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 20px;
+  text-align: left;
+}
+
+.result-container.success {
+  background-color: #d4edda;
+  border: 2px solid #c3e6cb;
+  color: #155724;
+}
+
+.result-container.error {
+  background-color: #f8d7da;
+  border: 2px solid #f5c6cb;
+  color: #721c24;
+  text-align: center;
+}
+
+.result-container h2 {
+  margin-top: 0;
+  text-align: center;
+}
+
+.result-container ul {
+  list-style: none;
+  padding: 0;
+}
+
+.result-container li {
+  font-size: 1.1em;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.scan-again-btn {
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+  padding: 15px;
+  font-size: 1.2em;
+  font-weight: 600;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}

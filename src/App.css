@@ -1,38 +1,50 @@
-.App {
-  text-align: center;
+.main-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr 380px;
+  gap: 30px;
+  padding: 30px;
+  align-items: flex-start;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.menu-section {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.menu-container {
+  display: flex;
+  flex-wrap: wrap;
+  /* Using grid for better alignment */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+.not-found-container {
+  grid-column: 1 / -1; /* Makes it span the full width of the menu area */
+  text-align: center;
+  padding: 50px 20px;
+  color: #aaa;
+}
+.not-found-container h3 {
+  color: #777;
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+.not-found-container p {
+  margin: 0;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+/* --- Mobile Responsiveness --- */
+@media (max-width: 900px) {
+  .main-layout {
+    /* Switch to a single column layout on smaller screens */
+    grid-template-columns: 1fr;
+    padding: 15px;
   }
-  to {
-    transform: rotate(360deg);
+
+  .category-nav, .cart-container {
+    /* Make the category and cart sections full-width */
+    width: 100%;
+    position: static; /* Remove the "sticky" behavior on mobile */
   }
 }

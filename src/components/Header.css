@@ -1,0 +1,67 @@
+.app-header-sticky {
+  background-color: #ffffff;
+  padding: 15px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  /* This is the magic for the "sticky" effect */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-brand {
+  font-size: 1.6em;
+  font-weight: 700;
+  color: #007bff;
+  display: flex;
+  align-items: center;
+}
+
+.header-brand span {
+  margin-right: 12px;
+}
+
+.header-nav a {
+  margin-left: 25px;
+  text-decoration: none;
+  color: #555;
+  font-weight: 600;
+  font-size: 1.1em;
+  position: relative;
+  padding-bottom: 5px;
+  transition: color 0.3s ease;
+}
+
+.header-nav a:hover {
+  color: #007bff;
+}
+
+/* Dynamic underline effect on hover */
+.header-nav a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: #007bff;
+  transition: width 0.3s ease;
+}
+
+.header-nav a:hover::after {
+  width: 100%;
+}
+.logout-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 15px;
+  font-weight: 600;
+  font-size: 1em;
+  margin-left: 25px;
+  cursor: pointer;
+}
