@@ -11,7 +11,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/AdminDashboard';
 import StaffScannerPage from './pages/StaffScannerPage';
-import OrderSuccessPage from './pages/OrderSuccessPage'; // Import the success page
+import OrderSuccessPage from './pages/OrderSuccessPage';
 import { Toaster, toast } from 'react-hot-toast';
 import './App.css';
 
@@ -27,7 +27,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/order-success" element={<OrderSuccessPage />} /> {/* Add success page route */}
+          <Route path="/order-success" element={<OrderSuccessPage />} />
 
           {/* Protected Manager Route */}
           <Route 
@@ -79,11 +79,22 @@ function HomePage() {
 
   // --- Core Functions ---
 
+  // MODIFIED: addToCart now checks against available stock
   const addToCart = (itemToAdd) => {
-    if (itemToAdd.quantity <= 0) {
+    const stockItem = menuItems.find(item => item._id === itemToAdd._id);
+    const itemInCart = cartItems.find(item => item._id === itemToAdd._id);
+    const currentQuantityInCart = itemInCart ? itemInCart.quantity : 0;
+
+    if (stockItem.quantity <= 0) {
       toast.error(`${itemToAdd.name} is sold out!`);
       return;
     }
+
+    if (currentQuantityInCart >= stockItem.quantity) {
+      toast.error(`No more ${itemToAdd.name} in stock!`);
+      return;
+    }
+
     toast.success(`${itemToAdd.name} added to cart!`);
     setCartItems(prevItems => {
       const isItemInCart = prevItems.find(item => item._id === itemToAdd._id);
@@ -110,13 +121,11 @@ function HomePage() {
     });
   };
 
-  // CORRECTED: handleCheckout for soft launch
   const handleCheckout = async () => {
     if (cartItems.length === 0) {
       toast.error("Your cart is empty!");
       return;
     }
-    // 'orderDetails' is now correctly defined inside the function
     const orderDetails = {
       items: cartItems.map(item => ({ name: item.name, price: item.price, quantity: item.quantity })),
       totalAmount: cartItems.reduce((price, item) => price + item.quantity * item.price, 0),
@@ -129,13 +138,12 @@ function HomePage() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
-
       toast.success('Order placed!');
-      // Navigate to the success page with the order ID
       navigate('/order-success', { state: { orderDetails: { ...orderDetails, orderId: data.orderId } } });
-      setCartItems([]); // Clear the cart
+      setCartItems([]);
     } catch (error) {
       toast.error(error.message);
+      console.error('Failed to create order:', error);
     }
   };
   
