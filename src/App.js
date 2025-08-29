@@ -122,7 +122,7 @@ function HomePage() {
       totalAmount: cartItems.reduce((price, item) => price + item.quantity * item.price, 0),
     };
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/menu`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderDetails),
