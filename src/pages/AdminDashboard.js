@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast';
 import './AdminDashboard.css';
 
 // --- API Helper Functions ---
-// Centralizing API calls makes the code cleaner and easier to manage.
+// This centralizes all API calls and ensures they use the correct live URL and token.
 const api = {
   get: async (url, token) => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}${url}`, {
@@ -84,6 +84,7 @@ function AdminDashboard() {
   // --- Data Fetching ---
   const fetchMenu = useCallback(async () => {
     try {
+      // The menu is public, so we don't strictly need a token, but sending it is fine.
       const data = await api.get('/api/menu', token);
       setMenuItems(data);
     } catch (error) {
@@ -152,7 +153,8 @@ function AdminDashboard() {
   const handleAddStaffSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/api/auth/register', { ...currentStaff, role: 'staff' }, token);
+      // Note: The register endpoint doesn't need a token in our current setup
+      await api.post('/api/auth/register', { ...currentStaff, role: 'staff' }, null);
       toast.success('Staff member added!');
       setModal(null);
       fetchStaff();
@@ -188,7 +190,30 @@ function AdminDashboard() {
   };
 
   // --- Report Download ---
-  const handleDownloadReport = async () => { /* ... (same as before) ... */ };
+  const handleDownloadReport = async () => {
+    try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/reports/daily`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            throw new Error(errorData?.message || 'Failed to generate report.');
+        }
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `daily_report_${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+        toast.success('Report downloaded!');
+    } catch (error) {
+        toast.error(error.message);
+    }
+  };
 
   return (
     <div className="admin-dashboard">
@@ -250,16 +275,16 @@ function AdminDashboard() {
       {modal === 'menu' && (
         <div className="form-modal">
           <form onSubmit={handleMenuSubmit} className="menu-item-form">
-            <h2>{currentItem._id ? 'Edit Item' : 'Add New Item'}</h2>
-            <input name="name" value={currentItem.name} onChange={(e) => handleInputChange(e, setCurrentItem)} placeholder="Item Name" required />
-            <input name="price" type="number" value={currentItem.price} onChange={(e) => handleInputChange(e, setCurrentItem)} placeholder="Price" required />
-            <input name="quantity" type="number" value={currentItem.quantity} onChange={(e) => handleInputChange(e, setCurrentItem)} placeholder="Available Quantity" required />
-            <input name="imageUrl" value={currentItem.imageUrl} onChange={(e) => handleInputChange(e, setCurrentItem)} placeholder="Image URL" />
-            <select name="category" value={currentItem.category} onChange={(e) => handleInputChange(e, setCurrentItem)}>
+            <h2>{currentItem?._id ? 'Edit Item' : 'Add New Item'}</h2>
+            <input name="name" value={currentItem?.name || ''} onChange={(e) => handleInputChange(e, setCurrentItem)} placeholder="Item Name" required />
+            <input name="price" type="number" value={currentItem?.price || ''} onChange={(e) => handleInputChange(e, setCurrentItem)} placeholder="Price" required />
+            <input name="quantity" type="number" value={currentItem?.quantity || 0} onChange={(e) => handleInputChange(e, setCurrentItem)} placeholder="Available Quantity" required />
+            <input name="imageUrl" value={currentItem?.imageUrl || ''} onChange={(e) => handleInputChange(e, setCurrentItem)} placeholder="Image URL" />
+            <select name="category" value={currentItem?.category || 'Snacks'} onChange={(e) => handleInputChange(e, setCurrentItem)}>
               <option value="Snacks">Snacks</option><option value="Meals">Meals</option><option value="Drinks">Drinks</option>
             </select>
             <div className="form-actions">
-              <button type="submit">{currentItem._id ? 'Update Item' : 'Create Item'}</button>
+              <button type="submit">{currentItem?._id ? 'Update Item' : 'Create Item'}</button>
               <button type="button" onClick={() => setModal(null)}>Cancel</button>
             </div>
           </form>
@@ -270,8 +295,8 @@ function AdminDashboard() {
         <div className="form-modal">
           <form onSubmit={handleAddStaffSubmit} className="menu-item-form">
             <h2>Add New Staff</h2>
-            <input name="email" type="email" value={currentStaff.email} onChange={(e) => handleInputChange(e, setCurrentStaff)} placeholder="Staff Email" required />
-            <input name="password" type="password" value={currentStaff.password} onChange={(e) => handleInputChange(e, setCurrentStaff)} placeholder="Temporary Password" required />
+            <input name="email" type="email" value={currentStaff?.email || ''} onChange={(e) => handleInputChange(e, setCurrentStaff)} placeholder="Staff Email" required />
+            <input name="password" type="password" value={currentStaff?.password || ''} onChange={(e) => handleInputChange(e, setCurrentStaff)} placeholder="Temporary Password" required />
             <div className="form-actions">
               <button type="submit">Create Account</button>
               <button type="button" onClick={() => setModal(null)}>Cancel</button>
@@ -284,7 +309,7 @@ function AdminDashboard() {
         <div className="form-modal">
           <form onSubmit={handlePasswordSubmit} className="menu-item-form">
             <h2>Reset Password</h2>
-            <p>For: <strong>{currentStaff.email}</strong></p>
+            <p>For: <strong>{currentStaff?.email}</strong></p>
             <input name="password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Enter New Password" required />
             <div className="form-actions">
               <button type="submit">Update Password</button>
