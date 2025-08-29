@@ -32,7 +32,7 @@ function StaffScannerPage() {
       const orderId = decodedText;
 
       try {
-        const response = awaitfetch(`${process.env.REACT_APP_API_URL}/api/menu`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/menu`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
