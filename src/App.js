@@ -86,11 +86,13 @@ function HomePage() {
     const currentQuantityInCart = itemInCart ? itemInCart.quantity : 0;
 
     if (stockItem.quantity <= 0) {
+      // This creates the "Sold Out" pop-up
       toast.error(`${itemToAdd.name} is sold out!`);
       return;
     }
 
     if (currentQuantityInCart >= stockItem.quantity) {
+      // This creates the "No more in stock" pop-up
       toast.error(`No more ${itemToAdd.name} in stock!`);
       return;
     }
