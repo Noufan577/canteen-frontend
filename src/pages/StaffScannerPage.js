@@ -4,7 +4,7 @@ import { toast, Toaster } from 'react-hot-toast';
 
 /**
  * ScannerContent Component
- * Fixed to ensure it hits the correct /api/orders/scan endpoint and handles 401s.
+ * Fixed the endpoint from /api/menu (Manager only) to /api/orders/scan (Staff/Manager).
  */
 const ScannerContent = () => {
   const [scanResult, setScanResult] = useState(null);
@@ -17,18 +17,18 @@ const ScannerContent = () => {
     const token = localStorage.getItem('token');
     const userStr = localStorage.getItem('user');
     
-    // Redirect if not logged in
+    // Safety check for login session
     if (!token || !userStr) {
-      toast.error("Security session missing. Please login.");
+      toast.error("Session missing. Please login.");
       const timer = setTimeout(() => navigate('/login'), 2000);
       return () => clearTimeout(timer);
     }
 
-    // Role check
+    // Role validation
     try {
       const user = JSON.parse(userStr);
       if (user.role !== 'staff' && user.role !== 'manager') {
-        toast.error("Unauthorized: Staff only.");
+        toast.error("Unauthorized access.");
         navigate('/');
         return;
       }
@@ -36,7 +36,7 @@ const ScannerContent = () => {
       navigate('/login');
     }
 
-    // Load scanner library
+    // Dynamic loading of the QR library
     const script = document.createElement('script');
     script.src = "https://unpkg.com/html5-qrcode";
     script.async = true;
@@ -84,12 +84,9 @@ const ScannerContent = () => {
 
     try {
       const token = localStorage.getItem('token');
-      // Ensure we hit the LIVE render URL if available, otherwise localhost
       const apiUrl = process.env.REACT_APP_API_URL || 'https://canteen-api-eassyfood.onrender.com';
 
-      console.log(`[DEBUG] Scanning Order at: ${apiUrl}/api/orders/scan`);
-
-      // FIXED: Endpoint corrected from /api/menu to /api/orders/scan
+      // API call to the CORRECT scanning endpoint
       const response = await fetch(`${apiUrl}/api/orders/scan`, {
         method: 'POST',
         headers: {
@@ -102,14 +99,13 @@ const ScannerContent = () => {
       const data = await response.json();
 
       if (response.status === 401) {
-        // If the token is rejected, force a logout to refresh the session
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        throw new Error("Session expired or invalid token. Redirecting to login...");
+        throw new Error("Session expired. Please log in again.");
       }
 
       if (response.ok) {
-        toast.success(data.message || 'Order Redeemed!', {
+        toast.success(data.message || 'Order Verified!', {
           duration: 5000,
           style: { background: '#10b981', color: '#fff' }
         });
@@ -119,15 +115,12 @@ const ScannerContent = () => {
     } catch (error) {
       console.error("[Scanner Error]", error);
       toast.error(error.message);
-      if (error.message.includes("Redirecting")) {
+      if (error.message.includes("log in")) {
         setTimeout(() => navigate('/login'), 2000);
       }
     } finally {
       setIsProcessing(false);
-      // Wait 3 seconds before allowing the next scan
-      setTimeout(() => {
-        setScanResult(null);
-      }, 3000);
+      setTimeout(() => setScanResult(null), 3000);
     }
   };
 
@@ -146,7 +139,7 @@ const ScannerContent = () => {
             {!isLibraryLoaded && (
               <div className="flex flex-col justify-center items-center h-64 animate-pulse">
                 <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-slate-500 text-xs mt-4">Waking up camera...</p>
+                <p className="text-slate-500 text-xs mt-4">Initializing camera...</p>
               </div>
             )}
             
@@ -155,17 +148,16 @@ const ScannerContent = () => {
             {isProcessing && (
               <div className="absolute inset-0 bg-white/90 flex flex-col items-center justify-center z-50">
                 <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-                <p className="font-bold text-indigo-900 mt-4">Verifying...</p>
+                <p className="font-bold text-indigo-900 mt-4">Verifying Order...</p>
               </div>
             )}
           </div>
 
-          <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-100">
-            <h3 className="text-xs font-bold text-amber-800 uppercase tracking-widest mb-1">Status Report</h3>
-            <p className="text-[10px] text-amber-700 leading-relaxed">
-              If you get a <strong>401 Error</strong> even after this fix, please 
-              <strong> LOG OUT and LOG IN </strong> again. Your token might be from a previous session 
-              that is no longer valid on the server.
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+            <h3 className="text-xs font-bold text-blue-800 uppercase tracking-widest mb-1">Status</h3>
+            <p className="text-[10px] text-blue-700 leading-relaxed">
+              Scan successful. If you encounter a 401 error, ensure you are logged in as a 
+              <strong> Staff</strong> member and not just a standard user.
             </p>
           </div>
         </div>
