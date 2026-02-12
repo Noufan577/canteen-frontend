@@ -7,7 +7,6 @@ import Cart from './components/Cart';
 import CategoryFilter from './components/CategoryFilter';
 import SearchBar from './components/SearchBar';
 import ProtectedRoute from './components/ProtectedRoute';
-import CheckoutPage from './pages/CheckoutPage';
 import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/AdminDashboard';
 import StaffScannerPage from './pages/StaffScannerPage';
@@ -25,11 +24,10 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/order-success" element={<OrderSuccessPage />} />
 
-          {/* Protected Manager Route */}
+          {/* Protected Routes */}
           <Route 
             path="/admin" 
             element={
@@ -38,8 +36,6 @@ function App() {
               </ProtectedRoute>
             } 
           />
-
-          {/* Protected Staff Route */}
           <Route 
             path="/staff/scanner" 
             element={
@@ -79,7 +75,6 @@ function HomePage() {
 
   // --- Core Functions ---
 
-  // MODIFIED: addToCart now checks against available stock
   const addToCart = (itemToAdd) => {
     const stockItem = menuItems.find(item => item._id === itemToAdd._id);
     const itemInCart = cartItems.find(item => item._id === itemToAdd._id);
@@ -121,28 +116,33 @@ function HomePage() {
     });
   };
 
+  // --- CORRECTED: handleCheckout for Direct QR Flow ---
   const handleCheckout = async () => {
     if (cartItems.length === 0) {
       toast.error("Your cart is empty!");
       return;
     }
     const orderDetails = {
-      items: cartItems.map(item => ({ name: item.name, price: item.price, quantity: item.quantity })),
+      // Include _id so backend can find the item for stock checking
+      items: cartItems.map(item => ({ _id: item._id, name: item.name, price: item.price, quantity: item.quantity })),
       totalAmount: cartItems.reduce((price, item) => price + item.quantity * item.price, 0),
     };
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/checkout`, {
+      // Use the correct direct checkout URL
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/checkout/direct`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderDetails),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
+
       toast.success('Order placed!');
-      navigate('/order-success', { state: { orderDetails: { ...orderDetails, orderId: data.orderId } } });
+      // THE FIX: Send only the orderId, as the success page expects
+      navigate('/order-success', { state: { orderId: data.orderId } });
       setCartItems([]);
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to place order.");
       console.error('Failed to create order:', error);
     }
   };
@@ -203,3 +203,4 @@ function HomePage() {
 }
 
 export default App;
+

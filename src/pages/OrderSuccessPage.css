@@ -7,6 +7,21 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   text-align: center;
   border: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.success-checkmark {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #28a745;
+  color: white;
+  font-size: 50px;
+  line-height: 80px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .order-success-container h2 {
@@ -27,14 +42,30 @@
   border-radius: 12px;
   display: inline-block; /* Ensures the background fits the content */
   border: 1px solid #eee;
+  margin-bottom: 20px;
 }
 
-.order-success-container h3 {
-  margin-top: 25px;
-  font-weight: 600;
-  color: #333;
-  background-color: #f0f0f0;
-  padding: 10px;
-  border-radius: 8px;
-  display: inline-block;
+.order-success-container .order-id-text {
+  font-family: monospace;
+  font-size: 0.9em;
+  color: #888;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 30px;
 }
+
+.back-to-menu-btn {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.back-to-menu-btn:hover {
+    background-color: #0056b3;
+}
+
