@@ -6,7 +6,7 @@ import './AdminDashboard.css';
 // This centralizes all API calls and ensures they use the correct live URL and token.
 const api = {
   get: async (url, token) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}${url}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}${url}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!response.ok) {
@@ -16,7 +16,7 @@ const api = {
     return response.json();
   },
   post: async (url, body, token) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}${url}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}${url}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify(body)
@@ -28,7 +28,7 @@ const api = {
     return response.json();
   },
   put: async (url, body, token) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}${url}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}${url}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(body)
@@ -40,7 +40,7 @@ const api = {
     return response.json();
   },
   patch: async (url, body, token) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}${url}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}${url}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(body)
@@ -52,7 +52,7 @@ const api = {
     return response.json();
   },
   delete: async (url, token) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}${url}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}${url}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -192,7 +192,7 @@ function AdminDashboard() {
   // --- Report Download ---
   const handleDownloadReport = async () => {
     try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/admin/reports/daily`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/reports/daily`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!response.ok) {

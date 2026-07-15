@@ -131,7 +131,7 @@ function HomePage() {
       totalAmount: cartItems.reduce((price, item) => price + item.quantity * item.price, 0),
     };
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/checkout`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderDetails),
@@ -150,7 +150,7 @@ function HomePage() {
   // --- Data Fetching ---
   useEffect(() => {
     setIsLoading(true);
-    fetch(`${process.env.REACT_APP_API_URL}/api/menu`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/menu`)
       .then(response => response.json())
       .then(data => {
         setMenuItems(data);
